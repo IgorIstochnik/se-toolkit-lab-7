@@ -13,7 +13,6 @@
   - [`APP_HOST_PORT`](#app_host_port)
   - [`APP_ENABLE_INTERACTIONS`](#app_enable_interactions)
   - [`APP_ENABLE_LEARNERS`](#app_enable_learners)
-  - [`API_KEY`](#api_key)
 - [`autochecker`](#autochecker)
   - [`AUTOCHECKER_API_URL`](#autochecker_api_url)
   - [`AUTOCHECKER_EMAIL`](#autochecker_email)
@@ -34,6 +33,7 @@
 - [LMS](#lms)
   - [`LMS_API_HOST_ADDRESS`](#lms_api_host_address)
   - [`LMS_API_HOST_PORT`](#lms_api_host_port)
+  - [`LMS_API_KEY`](#lms_api_key)
 - [Constants](#constants)
   - [`CONST_POSTGRESQL_SERVICE_NAME`](#const_postgresql_service_name)
   - [`CONST_POSTGRESQL_SERVER_NAME`](#const_postgresql_server_name)
@@ -110,12 +110,6 @@ Default: `true`
 A [feature flag](./environments.md#feature-flag) for enabling the `/learners` endpoint.
 
 Default: `true`
-
-### `API_KEY`
-
-The secret key used to authorize [API](./api.md#what-is-an-api) requests. See [API key authentication](./security.md#api-key-authentication).
-
-Default: `my-secret-api-key`
 
 ## `autochecker`
 
@@ -226,6 +220,12 @@ The [IP address](./computer-networks.md#ip-address) exposed on the [host](./comp
 The [port number](./computer-networks.md#port-number) exposed on the [host](./computer-networks.md#host) for accessing the [LMS API](./lms-api.md#about-the-lms-api) via [`Caddy`](./lms-api.md#caddy).
 
 Default: `42002`
+
+### `LMS_API_KEY`
+
+The [API key](./web-api.md#api-key) used to authorize the [LMS API](./lms-api.md#lms-api) requests.
+
+Default: `my-secret-api-key`
 
 ## Constants
 
