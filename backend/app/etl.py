@@ -69,10 +69,10 @@ async def fetch_logs(since: datetime | None = None) -> list[ApiLog]:
     """Fetch check results from the autochecker API with pagination."""
     all_logs: list[ApiLog] = []
 
-    async with httpx.AsyncClient(timeout=60) as client:
+    async with httpx.AsyncClient(timeout=300.0) as client:
         cursor = since
         while True:
-            params: dict[str, str | int] = {"limit": 500}
+            params: dict[str, str | int] = {"limit": 100}
             if cursor is not None:
                 params["since"] = cursor.isoformat()
 
