@@ -12,7 +12,9 @@
     }
     handle /pipeline* {
         reverse_proxy http://backend:{$BACKEND_CONTAINER_PORT} {
-            timeout 300s
+            transport http {
+                response_header_timeout 300s
+            }
         }
     }
     handle /analytics* {
