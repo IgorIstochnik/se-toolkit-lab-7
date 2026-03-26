@@ -92,6 +92,63 @@ By the end of this lab, you should be able to say:
 3. [Intent-Based Natural Language Routing](./lab/tasks/required/task-3.md) — P1: LLM tool use
 4. [Containerize and Document](./lab/tasks/required/task-4.md) — P3: containerize + deploy
 
+## Deploy
+
+### Prerequisites
+
+Before deploying, ensure you have:
+
+- `.env.docker.secret` with required environment variables:
+  - `BOT_TOKEN` — Telegram bot token from @BotFather
+  - `LMS_API_KEY` — Backend API key
+  - `LLM_API_KEY` — LLM API key (Qwen Code)
+  - `LLM_API_BASE_URL` — LLM API base URL (e.g., `http://localhost:42005/v1`)
+  - `LLM_API_MODEL` — Model name (e.g., `coder-model`)
+
+### Deploy with Docker Compose
+
+1. **Stop any running bot process:**
+
+   ```bash
+   pkill -f "bot.py" 2>/dev/null
+   ```
+
+2. **Start all services:**
+
+   ```bash
+   cd ~/se-toolkit-lab-7
+   docker compose --env-file .env.docker.secret up --build -d
+   ```
+
+3. **Verify services are running:**
+
+   ```bash
+   docker compose --env-file .env.docker.secret ps
+   ```
+
+   You should see `backend`, `postgres`, `caddy`, `pgadmin`, and `bot` all running.
+
+4. **Check bot logs:**
+
+   ```bash
+   docker compose --env-file .env.docker.secret logs bot --tail 20
+   ```
+
+   Look for "Application started" and no Python tracebacks.
+
+5. **Test in Telegram:**
+
+   Send `/start`, `/health`, or a natural language query like "what labs are available?"
+
+### Troubleshooting
+
+| Symptom | Solution |
+|---------|----------|
+| Bot container restarting | Check logs: `docker compose logs bot` |
+| `/health` fails | Ensure `LMS_API_BASE_URL=http://backend:8000` (not localhost) |
+| LLM queries fail | Ensure `LLM_API_BASE_URL` uses correct address |
+| Missing env vars | Add to `.env.docker.secret` and restart |
+
 ### Optional
 
 1. [Flutter Web Chatbot](./lab/tasks/optional/task-1.md)
