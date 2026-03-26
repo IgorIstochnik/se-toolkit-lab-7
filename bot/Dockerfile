@@ -9,18 +9,18 @@ ENV UV_PYTHON_DOWNLOADS=0
 
 WORKDIR /app
 
+# Copy dependency files first
+COPY pyproject.toml uv.lock /app/
+COPY bot/pyproject.toml /app/bot/
+
 # Sync bot dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    --mount=type=bind,source=bot/pyproject.toml,target=bot/pyproject.toml \
-    uv sync --locked --no-install-project
+    uv sync --frozen
 
 COPY bot /app/bot
-COPY pyproject.toml uv.lock /app/
 
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked
+    uv sync --frozen
 
 
 # Stage 2: Final image
