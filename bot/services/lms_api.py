@@ -94,6 +94,38 @@ class LMSAPIClient:
         items = await self.get_items()
         return {"healthy": True, "item_count": len(items)}
 
+    async def get_learners(self) -> list[dict]:
+        """Fetch all enrolled learners."""
+        return await self._request("GET", "/learners/")
+
+    async def get_scores(self, lab_id: str) -> list[dict]:
+        """Fetch score distribution for a lab."""
+        return await self._request("GET", "/analytics/scores", params={"lab": lab_id})
+
+    async def get_timeline(self, lab_id: str) -> list[dict]:
+        """Fetch submission timeline for a lab."""
+        return await self._request("GET", "/analytics/timeline", params={"lab": lab_id})
+
+    async def get_groups(self, lab_id: str) -> list[dict]:
+        """Fetch per-group performance for a lab."""
+        return await self._request("GET", "/analytics/groups", params={"lab": lab_id})
+
+    async def get_top_learners(self, lab_id: str, limit: int = 5) -> list[dict]:
+        """Fetch top N learners for a lab."""
+        return await self._request(
+            "GET", "/analytics/top-learners", params={"lab": lab_id, "limit": limit}
+        )
+
+    async def get_completion_rate(self, lab_id: str) -> dict:
+        """Fetch completion rate for a lab."""
+        return await self._request(
+            "GET", "/analytics/completion-rate", params={"lab": lab_id}
+        )
+
+    async def trigger_sync(self) -> dict:
+        """Trigger ETL sync."""
+        return await self._request("POST", "/pipeline/sync", json={})
+
 
 # Global client instance
 lms_api = LMSAPIClient()

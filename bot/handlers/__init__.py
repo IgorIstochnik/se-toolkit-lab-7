@@ -10,6 +10,8 @@ from the transport layer (Telegram).
 """
 
 from services.lms_api import LMSAPIError, lms_api
+from services.llm_client import llm_client
+from handlers.intent_router import TOOLS, SYSTEM_PROMPT
 
 
 async def handle_start() -> str:
@@ -24,7 +26,13 @@ async def handle_help() -> str:
 /help — Show this help
 /health — Check backend connection
 /labs — List available labs
-/scores <lab> — View pass rates for a lab (e.g., /scores lab-04)"""
+/scores <lab> — View pass rates for a lab (e.g., /scores lab-04)
+
+You can also ask questions in plain English, like:
+- "Which labs are available?"
+- "Show me scores for lab 4"
+- "Which lab has the lowest pass rate?"
+- "Who are the top 5 students in lab 3?" """
 
 
 async def handle_health() -> str:
@@ -72,3 +80,24 @@ async def handle_scores(lab_id: str | None = None) -> str:
         return "\n".join(lines)
     except LMSAPIError as e:
         return f"Failed to fetch scores for {lab_id}: {e.message}"
+
+
+async def handle_intent(message: str) -> str:
+    """Handle natural language queries using LLM intent routing.
+
+    Args:
+        message: User's natural language query
+
+    Returns:
+        LLM-generated response based on tool results
+    """
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": message},
+    ]
+
+    try:
+        response = await llm_client.chat_with_tools(messages, TOOLS)
+        return response
+    except Exception as e:
+        return f"Sorry, I couldn't process that request: {str(e)}"

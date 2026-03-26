@@ -17,6 +17,7 @@ from config import settings
 from handlers import (
     handle_health,
     handle_help,
+    handle_intent,
     handle_labs,
     handle_scores,
     handle_start,
@@ -25,22 +26,27 @@ from handlers import (
 
 async def run_test_mode(command: str) -> None:
     """Run a command in test mode — call handler directly and print result."""
-    # Parse the command and route to the appropriate handler
-    if command == "/start" or command == "start":
-        response = await handle_start()
-    elif command == "/help" or command == "help":
-        response = await handle_help()
-    elif command == "/health" or command == "health":
-        response = await handle_health()
-    elif command == "/labs" or command == "labs":
-        response = await handle_labs()
-    elif command.startswith("/scores") or command.startswith("scores"):
-        # Extract lab_id if provided: /scores lab-04
-        parts = command.split()
-        lab_id = parts[1] if len(parts) > 1 else None
-        response = await handle_scores(lab_id)
+    # Check if it's a slash command or natural language
+    if command.startswith("/"):
+        # Parse the command and route to the appropriate handler
+        if command == "/start" or command == "start":
+            response = await handle_start()
+        elif command == "/help" or command == "help":
+            response = await handle_help()
+        elif command == "/health" or command == "health":
+            response = await handle_health()
+        elif command == "/labs" or command == "labs":
+            response = await handle_labs()
+        elif command.startswith("/scores") or command.startswith("scores"):
+            # Extract lab_id if provided: /scores lab-04
+            parts = command.split()
+            lab_id = parts[1] if len(parts) > 1 else None
+            response = await handle_scores(lab_id)
+        else:
+            response = f"Unknown command: {command}. Use /help for available commands."
     else:
-        response = f"Unknown command: {command}. Use /help for available commands."
+        # Natural language query - use intent router
+        response = await handle_intent(command)
 
     print(response)
 
@@ -80,6 +86,15 @@ async def run_telegram_mode() -> None:
         # Extract lab_id from command args: /scores lab-04
         lab_id = message.text.split()[1] if len(message.text.split()) > 1 else None
         response = await handle_scores(lab_id)
+        await message.answer(response)
+
+    # Handle all other messages (natural language queries)
+    @dp.message()
+    async def handle_message(message: types.Message) -> None:
+        # Skip if it's a command (commands are handled above)
+        if message.text and message.text.startswith("/"):
+            return
+        response = await handle_intent(message.text)
         await message.answer(response)
 
     # Start polling
